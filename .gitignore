@@ -1,0 +1,30 @@
+# Python cache and compiled files
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.so
+
+# Virtual environment / dependencies
+.env/
+.venv/
+env/
+venv/
+*.egg-info/
+*.egg
+pip-wheel-metadata/
+
+# Jupyter notebook checkpoints
+.ipynb_checkpoints/
+
+
+# Model files and serialized objects
+*.pkl
+*.h5
+*.joblib
+
+# Logs and temporary outputs
+*.log
+*.tmp
+*.out
+
