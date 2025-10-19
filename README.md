@@ -13,11 +13,11 @@ Using the MovieLens dataset, the project develops and evaluates both Collaborati
 
 # Key Business Questions
 
-How can user viewing patterns and preferences be used to recommend movies they’re likely to enjoy?
+1. How can user viewing patterns and preferences be used to recommend movies they’re likely to enjoy?
 
-Which recommendation technique, collaborative filtering or hybrid, offers the best balance between accuracy and diversity?
+2. Which recommendation technique, collaborative filtering or hybrid, offers the best balance between accuracy and diversity?
 
-How much can a personalized recommendation system improve user satisfaction and retention for streaming services?
+3. How much can a personalized recommendation system improve user satisfaction and retention for streaming services?
 
 # Business Objectives
 
