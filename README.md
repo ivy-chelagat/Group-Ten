@@ -1,9 +1,5 @@
 
-
-
 # RECOMMENDER SYSTEM FOR MOVIES
-
-
 
 # 1. Business Understanding
 
@@ -100,20 +96,9 @@ Merging: The ratings data is merged with the necessary title and genres informat
  
 Preview: The first 10 rows of the merged data are displayed for a quick verification of the merge operation.
 
-
-
-
     Ratings: (100836, 4)
     Movies: (9742, 3)
-    
-
-
-
-
-
-
-
-
+   
     userId       0
     movieId      0
     rating       0
@@ -121,311 +106,9 @@ Preview: The first 10 rows of the merged data are displayed for a quick verifica
     title        0
     genres       0
     dtype: int64
-
-
-
+    
 There are no any missing values.
 
-
-```python
-# Checking for duplicates
-ratings_merged.duplicated().sum()
-```
-
-
-
-
-    0
-
-
-
-No duplicates.
-
-# 4. Exploratory Data Analysis
-**Dataset Size:**
-
-Users: 610 unique users.
-
-Items (Movies): 9,724 unique movies. 
-
-Note: The user-entered code accidentally printed the user count for items, but the movieId unique count is 9,724 based on the movies.csv file structure.
-
-Interactions: 100,836 total ratings.
-
-**User Activity (Interactions per User):** 
-
-The average user has provided 165.7 ratings, which is quite high.
-
-Min: 20 ratings (Confirming the MovieLens condition that all included users have rated at least 20 movies).
-
-Max: 7,376 ratings (Indicating a few highly active "super-users").
-
-**Rating Distribution:** 
-
-The ratings are centered around the high end, with a median and mean rating of 4.0.Mean Rating: 3.501 (Out of 5.0)Std Dev: 1.043These statistics confirm the data is from a relatively small but highly active group of users, and ratings are generally positive.
-
-
-```python
-#Number of Users,Items and interactions
-n_users= ratings['userId'].nunique()
-n_items= ratings['movieId'].nunique()
-print(f'Users: {n_users}, Items: {n_users}, Interactions: {len(ratings)}')
-#Count Interactions per user
-user_counts= ratings.groupby('userId').size().describe()
-print(user_counts)
-# ratings distribution
-ratings['rating'].describe()
-```
-
-    Users: 610, Items: 610, Interactions: 100836
-    count     610.000000
-    mean      165.304918
-    std       269.480584
-    min        20.000000
-    25%        35.000000
-    50%        70.500000
-    75%       168.000000
-    max      2698.000000
-    dtype: float64
-    
-
-
-
-
-    count    100836.000000
-    mean          3.501557
-    std           1.042529
-    min           0.500000
-    25%           3.000000
-    50%           3.500000
-    75%           4.000000
-    max           5.000000
-    Name: rating, dtype: float64
-
-
-
-**data set overview**
-
-Here, the following is computed about the dataset:
-
-- The total number of ratings in the dataset.
-
-- The number of unique movies that have been rated.
-
-- The number of unique users who have provided ratings.
-
-
-
-```python
-n_ratings = len(ratings)
-n_movies = movies['movieId'].nunique()
-n_users = ratings['userId'].nunique()
-
-print(f'number of ratings: {n_ratings}')
-print(f'number of movies: {n_movies}')
-print(f'number of users: {n_users}')
-```
-
-    number of ratings: 100836
-    number of movies: 9742
-    number of users: 610
-    
-
-As part of the dataset overview, we also plot a distribution of User Ratings and Movie Ratings. 
-
-Plotting the distribution of user ratings will help identify whether it's most users contributing a few ratings or if it's some users rating a significant number of movies.
-
-Plotting movie ratings distribution will help identify whether it's a small number of movies receiving the majority of ratings or if the ratings are evenly distributed.
-
-
-```python
-# Compute the number of ratings
-user_rating_counts = ratings['userId'].value_counts()
-
-plt.figure(figsize = (10, 5))
-sns.histplot(user_rating_counts, bins = 50, kde = True, color = 'blue')
-plt.xlabel("Number of Ratings per User")
-plt.ylabel("Frequency")
-plt.title("Distribution of User Ratings Count")
-plt.show()
-```
-
-
-    
-![png](Recommender_System_files/Recommender%20System%20_24_0.png)
-    
-
-
-
-```python
-# Compute ratings per movie
-movie_rating_counts = ratings['movieId'].value_counts()
-
-plt.figure(figsize = (10, 5))
-sns.histplot(movie_rating_counts, bins = 50, kde = True, color = 'steelblue')
-plt.xlabel("Number of Ratings per Movie")
-plt.ylabel("Frequency")
-plt.title("Distribution of Movie Rating Counts")
-plt.grid(True)
-
-plt.show()
-```
-
-
-    
-![png](Recommender_System_files/Recommender%20System%20_25_0.png)
-    
-
-
-Plotting a Ratings Distribution visualization will also be helpful in understanding whether users tend to give positive, neutral or negative ratings.
-
-
-```python
-sns.countplot(x = 'rating', data = ratings)
-plt.title('Ratings Distribution')
-plt.show()
-```
-
-
-    
-![png](Recommender_System_files/Recommender%20System%20_27_0.png)
-    
-
-
-
-```python
-# Get top 10 most rated movies
-top_movies = ratings['movieId'].value_counts().head(10).index
-top_movies_df = movies[movies['movieId'].isin(top_movies)].copy()
-top_movies_df['num_ratings'] = ratings[ratings['movieId'].isin(top_movies)]['movieId'].value_counts().values
-
-plt.figure(figsize = (12, 6))
-sns.barplot(x = 'num_ratings', y = 'title', data = top_movies_df, palette = 'viridis',
-            hue = 'title', legend = False)
-plt.xlabel("Number of Ratings")
-plt.ylabel("Movie Title")
-plt.title("Top 10 Most Rated Movies")
-plt.show()
-```
-
-
-    
-![png](Recommender_System_files/Recommender%20System%20_28_0.png)
-    
-
-
-
-```python
-# check movie genres
-movies.head()
-```
-
-
-
-
-<div>
-<style scoped>
-    .dataframe tbody tr th:only-of-type {
-        vertical-align: middle;
-    }
-
-    .dataframe tbody tr th {
-        vertical-align: top;
-    }
-
-    .dataframe thead th {
-        text-align: right;
-    }
-</style>
-<table border="1" class="dataframe">
-  <thead>
-    <tr style="text-align: right;">
-      <th></th>
-      <th>movieId</th>
-      <th>title</th>
-      <th>genres</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>0</th>
-      <td>1</td>
-      <td>Toy Story (1995)</td>
-      <td>Adventure|Animation|Children|Comedy|Fantasy</td>
-    </tr>
-    <tr>
-      <th>1</th>
-      <td>2</td>
-      <td>Jumanji (1995)</td>
-      <td>Adventure|Children|Fantasy</td>
-    </tr>
-    <tr>
-      <th>2</th>
-      <td>3</td>
-      <td>Grumpier Old Men (1995)</td>
-      <td>Comedy|Romance</td>
-    </tr>
-    <tr>
-      <th>3</th>
-      <td>4</td>
-      <td>Waiting to Exhale (1995)</td>
-      <td>Comedy|Drama|Romance</td>
-    </tr>
-    <tr>
-      <th>4</th>
-      <td>5</td>
-      <td>Father of the Bride Part II (1995)</td>
-      <td>Comedy</td>
-    </tr>
-  </tbody>
-</table>
-</div>
-
-
-
-
-```python
-# Count occurrences of each genre across all movies and print unique genres
-genre_counts = Counter([g for genre in movies['genres'] for g in genre])
-print(len(genre_counts))
-
-genre_counts
-```
-
-    35
-    
-
-
-
-
-   
-             
-
-
-
-```python
-genre_counts_df = pd.DataFrame([genre_counts]).T.reset_index()
-genre_counts_df.columns = ['genre', 'count']
-genre_counts_df
-```
-
-
-
-
-<div>
-<style scoped>
-    .dataframe tbody tr th:only-of-type {
-        vertical-align: middle;
-    }
-
-    .dataframe tbody tr th {
-        vertical-align: top;
-    }
-
-    .dataframe thead th {
-        text-align: right;
-    }
-  
 ```python
 # Plotting the frequency of each movie genre
 sns.barplot(x = 'genre', y = 'count', data = genre_counts_df.sort_values(by = 'count', ascending = False), palette = 'magma',
@@ -433,14 +116,9 @@ sns.barplot(x = 'genre', y = 'count', data = genre_counts_df.sort_values(by = 'c
 plt.xticks(rotation = 90)
 plt.show()
 ```
-
-
-    
+   
 ![png](Recommender_System_files/Recommender%20System%20_32_0.png)
     
-
-
-
 ```python
 # To find the average rating per Genre
 ratings_merged = ratings_merged.assign(genres = ratings_merged["genres"].str.split("|")).explode("genres")
@@ -456,18 +134,13 @@ plt.ylabel("Genre")
 plt.title("Average Rating per Genre")
 plt.show()
 ```
-
-
     
 ![png](Recommender_System_files/Recommender%20System%20_33_0.png)
     
-
-
 # 5. Modeling
 
 ## 5.1 Temporal Train/Test Split
 This code will perform a tempral "leave-one-out" split-training on earlier interactions and testing on each user's latest rating, which gives a more realistic evaluation for recommendation systems
-
 
 ```python
 #Data Type Conversion for Timestamps
@@ -485,7 +158,6 @@ print('Train Interactions:', len(train_df))
 print('Test Interactions (held-out last per user):', len(test_df))
 
 ```
-
     Train Interactions: 100226
     Test Interactions (held-out last per user): 610
     
@@ -493,16 +165,12 @@ print('Test Interactions (held-out last per user):', len(test_df))
 ## 5.2 Data Preparation for Surprise (CF)
 This code converts the ratings Dataframe into a format the suprise library can use for model training and evaluation while defining the valid rating range
 
-
-
-
 ```python
 #Defining the Rating Scale
 reader= Reader(rating_scale=(0.5,5.0))
 #Loading Data into Surprise Format
 data_train= Dataset.load_from_df(ratings[['userId', 'movieId', 'rating']], reader)
 full_train= Dataset.load_from_df(ratings[['userId', 'movieId', 'rating']], reader)
-
 
 print(reader)
 print(data_train)
@@ -514,12 +182,8 @@ print(full_train)
     <surprise.dataset.DatasetAutoFolds object at 0x0000029FAF8BCC50>
     <surprise.dataset.DatasetAutoFolds object at 0x0000029FAF8BFEF0>
     
-
 ## 5.3 Hyperparameter Tuning for Collaborative Filtering (SVD):
 The code below performs Grid Search Cross-Validation (GridSearchCV) to find the optimal set of parameters for the Singular Value Decomposition (SVD) matrix factorization algorithm. This is a crucial step for optimizing the performance of the Collaborative Filtering component.
-
-
-
 
 ```python
 #Defining the Search Space
@@ -547,9 +211,6 @@ best_params=gs.best_params['rmse']
 ## 5.4 Final Collaborative Filtering (SVD) Model Training and Evaluation.
 This shows the models generalization performance after tuning and how well the final SVD recommender predicts real user ratings on Unseen movies.
 
-
-
-
 ```python
 #Final Model Training
 trainset = full_train.build_full_trainset()
@@ -567,9 +228,6 @@ rmse= accuracy.rmse(predictions, verbose=False)
 mae= accuracy.mae(predictions, verbose=False)
 print(f'RMSE: {rmse:.4f}, MAE: {mae:.4f}')
 
-
-
-
 ```
 
     Evaluating RMSE, MAE of algorithm SVD on 5 split(s).
@@ -584,7 +242,6 @@ print(f'RMSE: {rmse:.4f}, MAE: {mae:.4f}')
 
 ## 5.5 Content-Based Filtering (CBF) 
   Content-Based Filtering (CBF) implements a basic movie recommendation system based purely on genre similarity. 
-
 
 ```python
 
@@ -640,8 +297,6 @@ print(recommended_movies)
 ## 5.6 Svd Predictions
 This is going to be used to predict how specific users would rate every single movie in this dataset.
 
-
-
 ```python
 def get_svd_predictions(user_id, movies, ratings, best_model):
 
@@ -672,23 +327,6 @@ def get_svd_predictions(user_id, movies, ratings, best_model):
 ```python
 get_svd_predictions(5, movies, ratings, best_model)
 ```
-
-
-
-
-<div>
-<style scoped>
-    .dataframe tbody tr th:only-of-type {
-        vertical-align: middle;
-    }
-
-    .dataframe tbody tr th {
-        vertical-align: top;
-    }
-
-    .dataframe thead th {
-        text-align: right;
-    }
 
 ## 5.7 Cold-Start Logic
 * It utilizes a genre-based preference score for every movie, tailored to a specific user, or based on a global average if the user has no ratings.
@@ -740,23 +378,6 @@ get_genre_scores(99999, ratings, movies, genre_similarity)
 
     user 99999 has no ratings, using global genre preferences.
     
-
-
-
-
-<div>
-<style scoped>
-    .dataframe tbody tr th:only-of-type {
-        vertical-align: middle;
-    }
-
-    .dataframe tbody tr th {
-        vertical-align: top;
-    }
-
-    .dataframe thead th {
-        text-align: right;
-    }
 
 ## 5.8 Hybrid Recommendations
 This function, hybrid_recommendations, implements a hybrid movie recommendation system by combining two different types of models: Collaborative Filtering (CF) and Content-Based Filtering (CBF).
@@ -971,20 +592,15 @@ axes[1].set_ylabel("MAE")
 plt.tight_layout()
 plt.show()
 ```
-
-
     
 ![png](Recommender_System_files/Recommender%20System%20_62_0.png)
     
-
-
 ## 6.4 Scatter Plot
 This is a scatter plot comparing the predicted movie ratings from two different recommendation models (SVD and Hybrid) against the users' actual ratings.The plot visually represents the accuracy and bias of each model across the rated movies of 30 randomly selected users.
 
 The plot shows that the Hybrid model's predictions (orange dots) are generally tighter and closer to the line of perfect prediction for the movies it recommends (high actual ratings).
 
 This suggests that, at the crucial task of identifying and scoring the best movies for a user (where ratings are high), the Hybrid model demonstrates higher prediction accuracy and less variance compared to the SVD model's overall performance. This is strong evidence that blending genre similarity with collaborative filtering improves the quality of the top recommendations.
-
 
 ```python
 # Select 30 random user IDs
@@ -1043,14 +659,9 @@ plt.show()
     Warning: No results found for User 576. Skipping...
     No common movies found for user 507. Skipping evaluation.
     Warning: No results found for User 507. Skipping...
-    
-
-
-    
+       
 ![png](Recommender_System_files/Recommender%20System%20_64_1.png)
     
-
-
 ## 6.5 Kernel Density Estimate (KDE) plot.
 Showing the distribution of prediction errors for the SVD (Collaborative Filtering) model and the Hybrid (SVD + Genre) model.
 
@@ -1077,13 +688,9 @@ plt.title("Error Distribution of SVD vs Hybrid Model")
 plt.legend()
 plt.show()
 ```
-
-
     
 ![png](Recommender_System_files/Recommender%20System%20_66_0.png)
     
-
-
 # 7. Conclusions and Recommendations
 ## 7.1 Conclusion
 1. The project successfully built a movie recommendation system that predicts what users are likely to enjoy based on their past ratings.
@@ -1099,7 +706,6 @@ plt.show()
 * The SVD model established a strong baseline with an RMSE of $\approx 0.86$, which indicates that on a 5-point scale, the average prediction error is less than one point. This shows the efficacy of matrix factorization in uncovering latent user and item features.
 * A Hybrid Model confirms the principle that integrating different recommendation paradigms can compensate for individual weaknesses.
   
-
 ## 7.3 Recommendations
 1. Use the hybrid model in production to balance accuracy and diversity in recommendations.
 
