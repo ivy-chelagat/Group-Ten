@@ -1,5 +1,5 @@
 # Business Overview
-This project focuses on building a movie recommendation system inspired by platforms like Netflix and Showmax. It aims to tackle the challenge of “scroll fatigue” — when users spend too much time deciding what to watch — by providing personalized movie recommendations based on user preferences and behavior.
+This project focuses on building a movie recommendation system inspired by platforms like Netflix and Showmax. It aims to tackle the challenge of “scroll fatigue” , when users spend too much time deciding what to watch  by providing personalized movie recommendations based on user preferences and behavior.
 
 Using the MovieLens dataset, the project develops and evaluates both Collaborative Filtering (SVD) and Hybrid (SVD + Content-Based) models to predict user ratings and generate a top-five list of personalized movie suggestions.
 
@@ -15,7 +15,7 @@ Using the MovieLens dataset, the project develops and evaluates both Collaborati
 
 How can user viewing patterns and preferences be used to recommend movies they’re likely to enjoy?
 
-Which recommendation technique — collaborative filtering or hybrid — offers the best balance between accuracy and diversity?
+Which recommendation technique, collaborative filtering or hybrid, offers the best balance between accuracy and diversity?
 
 How much can a personalized recommendation system improve user satisfaction and retention for streaming services?
 
@@ -89,10 +89,13 @@ Pickle – Model serialization
 | **Hybrid (SVD + Genre)** | 1.30 | 1.20 | Slightly higher error but more diverse recommendations |
 
 
+
 # Key Evaluation Visuals
+
 
 Bar Chart: Compared average RMSE and MAE between SVD and Hybrid models.
 <img width="1189" height="490" alt="download" src="https://github.com/user-attachments/assets/edd63c1e-0604-4ba5-9eb3-005fccf88155" />
+
 
 
 Scatter Plot: Showed predicted vs. actual ratings — Hybrid predictions clustered more tightly for highly rated movies.
